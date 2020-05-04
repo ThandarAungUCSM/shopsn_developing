@@ -73,10 +73,27 @@
             </a>
           </div>
         </div>
+
+        <div class="recommend">
+          <img :src="recommendImg" /> 新品上架
+        </div>
+
+        <div class="newgood">
+          <ul class="newgoodlist">
+            <li v-for="(item,index) in shopgood" :key="item.id">
+              <img :src="URL+item.pic_url" alt="">
+              <p>{{item.title}}</p>
+              <div class="more">
+                <span>￥{{item.price_member}}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
         <!-- 推荐商品部分 -->
         <div class="recommend">
           <img :src="recommendImg" />推荐商品
         </div>
+
         <!-- 店铺首页的热门商品 -->
         <article-list :temList="0" :hotList="recommondGoods"></article-list>
       </div>
@@ -136,6 +153,7 @@ export default {
       atten: 0,
       // 临时数据
       alertData: [],
+      shopgood:[],
       shophomedata: "",
       storeInfo: "",
       style: "",
@@ -160,9 +178,10 @@ export default {
   mounted() {
     this.$store.state.shop_class_show = false;
     this.getRecommondGoods();
+    this.newGoods();
     this.getButton();
     this.storeHomeAjax();
-    this.storeInfo = res.data.data.storeInfo;
+    // this.storeInfo = res.data.data.storeInfo;
   },
   methods: {
     imgLeft(val) {
@@ -558,10 +577,8 @@ export default {
     },
     //获取banner
     getBanner() {
-      this.axios
-        .post(
-          this.$httpConfig.storeBanner,
-          qs.stringify({
+      this.axios.post(
+          this.$httpConfig.storeBanner, qs.stringify({
             store_id: this.$route.params.id
           })
         )
@@ -572,6 +589,16 @@ export default {
           }
           this.banner = res.data.data;
         });
+    },
+    newGoods(){
+      this.axios.post(this.$httpConfig.newGoods, qs.stringify({
+                store_id:this.$route.params.id
+              })).then(res => {
+                this.shopgood = res.data.data;
+              })
+              .catch(err => {
+                console.log(err);
+              })
     },
     //获取不规则图片
     getIrregular() {
@@ -707,6 +734,53 @@ export default {
     width: 0.3rem;
     height: 0.3rem;
     margin-right: 15/100rem;
+  }
+}
+
+.newgoodlist {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  .bttom {
+    width: 100%;
+    display: flex;
+    margin: 0.3rem 0 0 0;
+    justify-content: center;
+  }
+  li {
+    margin-top: 2%;
+    background-color: #fff;
+    width: 49%;
+    float: left;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+
+    img {
+      width: 100%;
+      height: 3.5rem;
+      align-self: center;
+      border-bottom: 0.5px solid #f2f1f2;
+    }
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0.15rem 0.25rem;
+      font-size: 28/100rem;
+    }
+    .more {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height: 0.5rem;
+      span {
+        padding: 0 0.25rem;
+        font-size: 0.28rem;
+        color: #d12f2d;
+      }
+    }
   }
 }
 

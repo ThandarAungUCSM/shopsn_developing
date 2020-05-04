@@ -7,6 +7,71 @@
             <div class="input-main fl" v-if="sea"><input type="text" placeholder="请输入商品名称..."></div>
             <span class="cartBtn" v-if="$store.state.catr_number" @click="toCart"><em>{{$store.state.catr_number}}</em></span>
             <div class="btn-search" v-if="search"></div>
+
+            <div class="sharebtn" @click="popupVisible=true">
+                <img src="../../../assets/sharebtn.png">
+            </div>
+
+            <mt-popup v-model="popupVisible" position="bottom" class="pop">
+            <div class="share_box">
+
+                    <div class="box_header">
+                        <p class="box_text">分享</p>
+                        <!--<span class="box_cross" @click="goshare">×</span>-->
+                    </div>
+                    <div class="share_logo">
+                        <div class="up">
+                            <img @click="copyLink" src="../../../assets/copy.png">
+                            <p class="up_text">夏制链接</p>
+                            <img @click="qrLink" src="../../../assets/QR-code.png">
+                            <p class="up_text" style="padding-left:0.19rem">二维码</p>
+                        </div>
+                        <div class="dn">
+                            <div class="account" @click="wxpage">
+                            <img src="../../../assets/share_wx_@1.png">
+                            <div class="txt">微信好友</div>
+                            </div>
+                            <div class="account" @click="initUrl">
+                            <img src="../../../assets/share_pyq_@1.png">
+                            <div class="txt">朋友圈</div>
+                            </div>
+                            <div class="account" @click="qqpage">
+                            <img src="../../../assets/share_qq_@1.png">
+                            <div class="txt">QQ好友</div>
+                            </div>
+                            <div class="account" @click="wbpage">
+                            <img src="../../../assets/share_wb_@1.png">
+                            <div class="txt">新浪微博</div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+            </mt-popup>
+
+            <mt-popup v-model="popup" position="bottom" class="pop">
+                <div class="copy">
+                    <div class="copy_header">
+                        <p class="copy_text">复制</p>
+                    </div>
+                    <div class="link">
+                        <input class="copy_link" type="text" :value="location" id="myInput">
+                        <button class="copy_button" @click="myFunction">Copy</button>
+                    </div>
+                </div>
+            </mt-popup>
+
+            <mt-popup v-model="popupV" position="center" class="qrDiv">
+                <div class="qr">
+                    <div class="qr_header">
+                        <p class="qr_text">QR扫描</p>
+                    </div>
+                    <div class="qr_code">
+                        <qr-code text="Text to encode" :value="code"></qr-code>
+                    </div>
+                </div>
+            </mt-popup>
+
             <div class="btn-ng clearfix" v-if="!btn" v-show="!set" @click="addClass">
                 <span class="fl"></span>
                 <span class="fl"></span>
@@ -35,14 +100,22 @@
     </div>
 </template>
 <script>
+    import { Popup } from 'mint-ui';
     import qs from 'qs';
     import { MessageBox,Toast } from 'mint-ui';
+    import VueQRCodeComponent from 'vue-qrcode-component'
     export default {
         name : 'shop-header',
         data(){
             return {
                 sta:false,
-                ruleCon:null
+                share:false,
+                ruleCon:null,
+                popupVisible:false,
+                popup:false,
+                popupV:false,
+                location:'',
+                code:''
             }
         },
         props:{
@@ -61,11 +134,40 @@
             checklist:''
         },
         computed:{
-            popupVisible(){
-                return this.popupVisible;
-            }
+            // popupVisible(){
+            //     return this.popupVisible;
+            // }
         },
         methods:{
+            initUrl(){
+                this.shareParams = location.href
+                this.$shareWeChat("shareParams");
+                console.log(this.$shareWeChat)
+            },
+            copyLink(){
+                this.popup = true;
+                this.location = location.href
+            },
+            qrLink(){
+                this.popupV = true;
+                this.code = location.href
+
+            },
+            myFunction() {
+            var copyText = document.getElementById("myInput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            },
+            wbpage(){
+               window.location.href='https://m.weibo.cn/quicklogin?r=https%3A%2F%2Fm.weibo.cn%2F%3Fjumpfrom%3Dweibocom'
+            },
+            qqpage(){
+               window.location.href='https://xui.ptlogin2.qq.com/cgi-bin/xlogin?appid=716027609&pt_3rd_aid=101019034&daid=383&pt_skey_valid=0&style=35&s_url=http%3A%2F%2Fconnect.qq.com&refer_cgi=authorize&which=&client_id=101019034&response_type=code&scope=get_info%2Cget_user_info&redirect_uri=https%3A%2F%2Fpassport.weibo.com%2Fothersitebind%2Fbind%3Fsite%3Dqq%26state%3DCODE-gz-1J7gz1-1Tj8eo-pCNJsg5lGBqf1WK0038e2%26bentry%3D3rdh5%26wl%3D%26callback%3Dhttp%253A%252F%252Flocalhost%253A8087%252Fproduct%252F161%252F1&display='
+            },
+            wxpage(){
+              window.location.href='https://mp.weixin.qq.com/'
+            },
             btnGo(){
 //							switch (this.text){
 //								case '积分商品详情':
@@ -79,7 +181,10 @@
 									this.$router.go(-1);
 //									break;
 //							}
-					},
+                    },
+            goshare() {
+                this.share = !this.share;
+            },
             toCart(){
 //              sessionStorage.setItem('router_index', 2);
                 this.$router.push({
@@ -130,6 +235,9 @@
                 this.popupVisible = true;
                 this.$emit('screen');
             }
+        },
+        mounted() {
+            this.initUrl();
         }
     }
 </script>
@@ -312,11 +420,11 @@
         }
         .cartBtn{
             position:absolute;
-            right:1.2rem;
+            right:1.65rem;
             top:50%;
             margin-top:-.23rem;
-            width:.6rem;
-            height:.46rem;
+            width:.7rem;
+            height:.5rem;
             background:url(../../../assets/cart.btn.png) no-repeat;
             background-size:100% 100%;
             em{
@@ -369,6 +477,125 @@
             background:url(../../../assets/search.png) no-repeat;
             background-size:100% 100%;
             margin-top:-.225rem;
+        }
+        .sharebtn{
+           margin:-0.5rem 0 0 5rem;
+           img{
+               width:18%;
+           }
+        }
+        .pop{
+            width: 100%;
+        }
+        .copy {
+            width: 100%;
+            height: 2.8rem;
+            .copy_header {
+                padding: .4rem .3rem;
+                text-align: center;
+                border-bottom: 1px solid #f1f1f1;
+                .copy_text {
+                    font-size: .34rem;
+                    color: #333;
+                }
+            }
+        }
+        .link {
+            padding: .4rem;
+            .copy_link {
+                width: 5.4rem;
+                height: .7rem;
+                border: 1px solid #999;
+                font-size: .28rem;
+                color: #333;
+                padding-left: .2rem;
+            }
+            .copy_button {
+                width: 1rem;
+                height: .7rem;
+                border: none;
+                font-size: .28rem;
+                color: #333;
+                padding: 0 .1rem;
+            }
+        }
+        .qrDiv {
+            /*width: 70%;*/
+        .qr {
+            width: 100%;
+            height: auto;
+            .qr_header {
+                padding: .4rem .3rem;
+                text-align: center;
+                border-bottom: 1px solid #f1f1f1;
+                .qr_text {
+                    font-size: .34rem;
+                    color: #333;
+                }
+            }
+            .qr_code {
+                padding: .3rem;
+                }
+            }
+        }
+        .share_box {
+            width: 100%;
+                .box_header {
+                    padding: .4rem .3rem;
+                    text-align: center;
+                    border-bottom: 1px solid #f1f1f1;
+                    .box_text  {
+                        font-size: .34rem;
+                        color: #333;
+                    }
+                    .box_cross {
+                        position: absolute;
+                        right: 3%;
+                        top: 0.38rem;
+                        width: 0.4rem;
+                        line-height: 0.34rem;
+                        height: 0.4rem;
+                        border: 1px solid #bfbfbf;
+                        text-align: center;
+                        font-size: 0.4rem;
+                        color: #bfbfbf;
+                        border-radius: 100%;
+                    }
+                }
+                .share_logo{
+                    color: #c5c5c5;
+                    text-align: left;
+                    padding:0.19rem;
+                }
+                    .up{    
+                        padding-bottom: 0.65rem;
+                        border-bottom: .01rem solid;
+                        margin: 0 .1rem 0 .1rem;
+
+                        img{
+                            padding: .25rem;
+                        }
+                        .up_text{
+                               position: absolute;
+                               top: 3rem;
+                               display: inline-flex;
+                               font-size: 0.29rem;
+                               margin-left: -1.5rem;
+                        }
+                    }
+                    .dn{
+                        display: flex;
+                        margin-left: .2rem;
+                        
+                        .account{
+                           width: 25%;
+                           padding: 0.3rem 0 0 0.1rem;
+
+                           .txt{
+                               padding: 0 0rem 0 .13rem;
+                           }
+                        }
+                    }
         }
         .btn-delete{
             position:absolute;

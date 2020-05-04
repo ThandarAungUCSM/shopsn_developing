@@ -12,6 +12,24 @@ import './style/base.css'
 import 'mint-ui/lib/style.css'
 //import 'element-ui/lib/theme-default/index.css'
 import MintUI from 'mint-ui'
+
+import scrollTitle from "./utils/scrollTitle";
+Vue.prototype.showScroll = scrollTitle;
+
+import QRCode from "qrcodejs2";
+Vue.prototype.$qrCode = QRCode;
+
+import VueQRCodeComponent from 'vue-qrcode-component'
+Vue.component('qr-code', VueQRCodeComponent)
+
+//wechat
+import VueWeChatShare from 'vue-wechat-share'
+Vue.use(VueWeChatShare)
+
+//检验字符串不为空
+import checkWord from "./utils/nullCheck";
+Vue.prototype.showCheck = checkWord;
+
 Vue.filter('formatDate', function(value) { //时间戳转换
     var time = new Date(Number(value) * 1000);
     var Y = time.getFullYear();

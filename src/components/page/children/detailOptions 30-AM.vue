@@ -16,16 +16,10 @@
               alt
               :src="URL + $store.state.commodity_data.goods.pic_url"
             />
-            <p v-if="spec.spec_children && tempequal == false && tempselectedList == spec.spec_children.length && onecount == 1" class="item">{{ data.goods.title }}</p>
-            <p v-else class="item">{{data.goods.title }}{{activeItem}}</p>
-<!-- data.goods.title -->
-            <span v-if="tempequal == false" class='item' style='color:red;font-size:14px'>
+            <p class="item">{{data.goods.title }}{{activeItem}}</p>
+            <span class='item' style='color:red;font-size:14px'>
               ￥
-              <!-- <em v-if="$store.state.commodity_data.goods.p_id==0">{{productData.price_member}}sss</em> -->
-              <em >{{$store.state.commodity_data.goods.price_member}}</em>
-            </span>
-            <span v-else class='item' style='color:red;font-size:14px'>
-              ￥
+              <!-- <em v-if="tempequal == false">{{$store.state.commodity_data.goods.price_member}}</em> -->
               <em v-if="$store.state.commodity_data.goods.p_id==0">{{productData.price_member}}</em>
               <em v-else>{{$store.state.commodity_data.goods.price_member}}</em>
             </span>
@@ -76,6 +70,29 @@
             <span class="delete-btn" @click="remove">×</span>
           </div>
 
+
+          <!-- <div class="content-scroll">
+            <div
+              class="gui clearfix"
+              v-if="spec.spec_group"
+              id="specifications"
+              v-for="(item,index) in spec.spec_group"
+              :key="item.id"
+            >
+              <p>{{item.name}}</p>
+              <span
+                :data-id="data.id"
+                :data-spec-id="data.spec_id"
+                v-if="item.id == data.spec_id"
+                v-for="data in spec.spec_children"
+                :class="{ gray: emptyStockGoods.indexOf(Number(data.id)) != -1,
+                          active:subIndex[index] == data.id,
+                          activeTab: activeItem == data.item }"
+                :key="data.id"
+                @click="addClass(index,$event,data.id); sendValue(data.item, data.id)"
+              >{{data.item}}</span>
+          </div> -->
+
           <div class="content-scroll">
             <div v-if="spec.spec_group">
               <div
@@ -85,29 +102,17 @@
                       :key="item.id"
               >
                 <p>{{item.name}}</p>
-                <div v-if="tempequal == false">
-                    <div v-for="(data, i) in spec.spec_children" :key="'A' + i">
-                          <span v-if="item.id == data.spec_id"
-                                :data-id="data.id"
-                                :data-spec-id="data.spec_id"
-                                :class="{ active: data.selectedItem == true, gray: emptyStockGoods.indexOf(Number(data.id)) != -1 }"
-                                @click="addClass(index,$event,data.id, item.id); sendValue(data, data.id, subIndex[index])"
-                          >
-                              {{data.item}}
-                          </span>
-                    </div>
-                </div>
-                <div v-else>
-                    <div v-for="(data, i) in spec.spec_children" :key="data.id">
-                          <span v-if="item.id == data.spec_id"
-                                :data-id="data.id"
-                                :data-spec-id="data.spec_id"
-                                :class="{ gray: emptyStockGoods.indexOf(Number(data.id)) != -1, active:subIndex[index] == data.id, activeTab: activeItem == data.item }"
-                                @click="addClass(index,$event,data.id); sendValue(data, data.id, subIndex[index])"
-                          >
-                              {{data.item}}
-                          </span>
-                    </div>
+                <div v-for="data in spec.spec_children" :key="data.id">
+                  <!-- , activeTab: activeItem == data.item || data.selectedItem == true -->
+                      <span v-if="item.id == data.spec_id"
+                            :data-id="data.id"
+                            :data-spec-id="data.spec_id"
+                            :class="{ active: data.selectedItem == true, gray: emptyStockGoods.indexOf(Number(data.id)) != -1 }"
+                            @click="addClass(index,$event,data.id, item.id); sendValue(data, data.id, subIndex[index])"
+                      >
+                          {{data.item}}
+                          <!-- :class="{ active: data.default_spec }" -->
+                      </span>
                 </div>
               </div>
             </div>
@@ -209,9 +214,7 @@ export default {
       addClassClick: false,
       tempValue: false,
       tempequal: false,
-      tempselectedList: [],
-      childitems: '',
-      onecount: 0
+      tempselectedList: []
     };
   },
   props: {
@@ -317,24 +320,7 @@ let tempdata = this.spec.spec_children
 this.tempequal = tempdata.every((val, i, arr) => val.spec_id == arr[0].spec_id)
 if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
   this.tempselectedList = this.spec.spec_children.length
-  this.onecount += 1;
-  // $store.state.commodity_data.goods.price_member
-
-  let goodsId = '';
-  for (let i in this.guigedata.goods) {
-      goodsId = this.guigedata.goods[i].goods_id;
-  }
-  console.log('good id ' + goodsId)
-  this.getData(goodsId)
-  
-  this.childitems = ' '
-  for (var j = 0; j < this.spec.spec_children.length; j++) {
-      this.childitems += this.spec.spec_children[j].item+ " "
-  }
-  
 }
-
-
 
 
 
@@ -441,10 +427,9 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
     
     addClass(index, event, id, groupid) {
         this.addClassClick = true
-        console.log(this.data.goods)
+        
         //   this.activeItem = data.item;
         this.activeItem = '';
-        this.onecount = 0
         
         if(this.tempequal == false) {
           for(let i = 0; i < this.spec.spec_children.length; i++) {
@@ -531,6 +516,9 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
           self.checkStock1();
         }
 
+
+
+
         let selectedList = [],
           sortList = "",
           str = "",
@@ -545,14 +533,15 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
           return a > b ? 1 : -1;
         });
 
+        
+        
+
         //字符串拼接
         var count = 0;
         for (var i in self.spec.spec_group) {
           count++;
         }
         str = sortList.join("_");
-
-
         //对比
         for (let i in self.guigedata.goods) {
           if (str === self.guigedata.goods[i].key) {
@@ -565,29 +554,22 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
           self.specKey = goodsId;
         }
 
-
-
-        if(self.tempequal == false && Object.keys(selectedList).length != self.spec.spec_children.length) {
+        var count = 0;
+        self.subIndex.forEach((item, index) => {
+          if (item == -1) {
+            count++;
+          }
+        });
+        if (
+          self.getArrayLenght(self.subIndex) !=
+            self.getArrayLenght(self.spec.spec_group) ||
+          count != 0
+        ) {
+          if (self.$store.state.goods_id != "") {
+            self.$store.state.goods_id = "";
+            self.specKey = "";
             self.getData(self.$route.params.id);
-        }
-        else {
-            var count = 0;
-            self.subIndex.forEach((item, index) => {
-              if (item == -1) {
-                count++;
-              }
-            });
-            if (
-              self.getArrayLenght(self.subIndex) !=
-                self.getArrayLenght(self.spec.spec_group) ||
-              count != 0
-            ) {
-              if (self.$store.state.goods_id != "") {
-                self.$store.state.goods_id = "";
-                self.specKey = "";
-                self.getData(self.$route.params.id);
-              }
-            }
+          }
         }
 
       }, 100);
@@ -602,6 +584,13 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
 
 
       this.tempselectedList = tempcount
+      console.log('addclass ' + tempcount)
+
+
+
+
+
+
 
 
 
@@ -787,51 +776,37 @@ if(this.tempequal == false && this.spec.spec_children[0].selectedItem == true) {
       },
     join() {
         // index, event, id
-      if(this.tempequal == false) {  
-          if(this.activeItem !== '') {
-              if (this.subIndex[Object.keys(this.spec.spec_group)] != this.spec.spec_children[0].id) {
-                  let tempsubindex = (this.spec.spec_group)
-                  if(this.tempselectedList == Object.keys(tempsubindex).length) {
-                      this.subIndex = []
-                      for (var i in tempsubindex) {
-                        this.subIndex.push([i]);
-                      }
-                  } else {
-                      this.subIndex[Object.keys(this.spec.spec_group)] = this.spec.spec_children[0].id;
-                      Vue.set(this.subIndex, Object.keys(this.spec.spec_group), this.spec.spec_children[0].id);
-                  }
-              } 
-              else {
-                  this.subIndex[Object.keys(this.spec.spec_group)] = -1;
-                  Vue.set(this.subIndex, Object.keys(this.spec.spec_group), -1);
-              }
-          } else {
-                  let tempsubindex = (this.spec.spec_group)
-                  if(this.tempselectedList == Object.keys(tempsubindex).length) {
-                      this.subIndex = []
-                      for (var i in tempsubindex) {
-                        this.subIndex.push([i]);
-                      }
-                  } 
-                  else {
-                      if(this.tempselectedList == 0) {
-                          this.subIndex[Object.keys(this.spec.spec_group)] = this.spec.spec_children[0].id;
-                          Vue.set(this.subIndex, Object.keys(this.spec.spec_group), this.spec.spec_children[0].id);
-                      }
-                  }
-          }
-      }  
-      else {
-          if(this.activeItem !== '') {
-              if (this.subIndex[Object.keys(this.spec.spec_group)] != this.spec.spec_children[0].id) {
-                  this.subIndex[Object.keys(this.spec.spec_group)] = this.spec.spec_children[0].id;
-                  Vue.set(this.subIndex, Object.keys(this.spec.spec_group), this.spec.spec_children[0].id);
-              } else {
-                  this.subIndex[Object.keys(this.spec.spec_group)] = -1;
-                  Vue.set(this.subIndex, Object.keys(this.spec.spec_group), -1);
-              }
-          }
-      }
+        console.log('join ' + this.tempselectedList )
+        if(this.activeItem !== '') {
+            if (this.subIndex[Object.keys(this.spec.spec_group)] != this.spec.spec_children[0].id) {
+                let tempsubindex = (this.spec.spec_group)
+                if(this.tempselectedList == Object.keys(tempsubindex).length) {
+                    this.subIndex = []
+                    for (var i in tempsubindex) {
+                      this.subIndex.push([i]);
+                    }
+                } else {
+                    this.subIndex[Object.keys(this.spec.spec_group)] = this.spec.spec_children[0].id;
+                    Vue.set(this.subIndex, Object.keys(this.spec.spec_group), this.spec.spec_children[0].id);
+                }
+            } 
+            else {
+                this.subIndex[Object.keys(this.spec.spec_group)] = -1;
+                Vue.set(this.subIndex, Object.keys(this.spec.spec_group), -1);
+            }
+        } else {
+                let tempsubindex = (this.spec.spec_group)
+                if(this.tempselectedList == Object.keys(tempsubindex).length) {
+                    this.subIndex = []
+                    for (var i in tempsubindex) {
+                      this.subIndex.push([i]);
+                    }
+                } else {
+                    this.subIndex[Object.keys(this.spec.spec_group)] = this.spec.spec_children[0].id;
+                    Vue.set(this.subIndex, Object.keys(this.spec.spec_group), this.spec.spec_children[0].id);
+                }
+        }
+
       var count = 0;
       this.subIndex.forEach((item, index) => {
         if (item == -1) {

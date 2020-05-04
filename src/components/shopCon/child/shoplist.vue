@@ -11,13 +11,15 @@
                     </div>
                     <router-link :to="{name:shopHome,params:{id:item.id,index:0}}" class="initShop" > 进店</router-link>
                 </div>
+                
                 <div class="con">
-                    <div  v-for=" val in item.store_goods" :key="val.id">
+                    <div  v-for=" val in item.store_goods" :key="val.id" @click="goproduct(val)">
                         <img v-if="val.pic_url" v-lazy="URL+val.pic_url" >
                         <img v-else :src="imgs" alt="">
                         <div>￥{{val.goods_price}}</div>
                     </div>
                 </div>
+               
             </li>
         </ul>
 </template>
@@ -28,7 +30,18 @@ export default {
 	          imgs:require('@/assets/cp.png'),
 	          shopHome:'shopHome'
 	      }
-	  },
+      },
+      methods:{
+          goproduct(goods){
+              this.$router.push({
+                  name:"product",
+                  params:{
+                      id:goods.id,
+                      status: 1
+                  }
+              })
+          }
+      },
 	 
 		props: ["shoplist"],
 	}

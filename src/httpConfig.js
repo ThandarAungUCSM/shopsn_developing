@@ -84,6 +84,7 @@ const config = {
     accessories: request + 'GoodsCombo/accessories', // 搭配配件
     package: request + 'GoodsPackage/packageList', // 优惠套餐
     shopInfo: request + 'Store/shopInfo', // 商品 归属店铺信息
+    newGoods: request + 'Store/NewGoods',
     ShopGoodClass: request + 'StoreBindGoodsClass/getBindGoodsClass', //店铺分类
     storeClass: request + 'StoreBindGoodsClass/storeClass',
     goodsProblems: request + 'GoodsConsultation/consultationData', // 商品咨询
@@ -305,6 +306,18 @@ const config = {
     getBalance: request + 'Balance/getBalance', //获取余额
     getFreight: request + 'FreightMonery/getFreightMoneyByEnoughToBuyImmediately', //获取运费
     initiatePayment: request + 'PayOrder/initiatePayment', //支付
+
+    // report: userModuleIndex + 'GoodsReport/report',
+    // reportTopic: userModuleIndex + 'GoodsReport/reportTopic',
+    // commitReport: userModuleIndex + 'GoodsReport/commitReport',
+
+    // report
+    noticeReport: userModuleIndex + 'GoodsReport/report',//举报
+    noticeType: userModuleIndex + 'GoodsReport/reportTopic',//举报类型
+    noticeSubmit: userModuleIndex + 'GoodsReport/commitReport',//举报类型提交
+    noticeList: userModuleIndex + 'GoodsReport/reportList',//举报类型列表
+    noticeCheckSingle: userModuleIndex + 'GoodsReport/reportDetail',//查看单条数据
+    cancelNotice: userModuleIndex + 'GoodsReport/cancelReport',//取消举报
 
 }
 export default config

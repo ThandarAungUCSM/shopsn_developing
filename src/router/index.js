@@ -129,7 +129,19 @@ const noticeChild = r => require(['@/components/page/children/notice_child'], r)
 // 商品详情页
 const withPackages = r => require(['@/components/product/withPackages'], r) // 套餐配件
 const product = r => require(['@/components/product/product'], r); //商品详情
+const report = r => require(['@/components/product/report'], r);
 const coupon = r => require(['@/components/product/coupon'], r); //优惠券
+
+// report
+const backInform = r => require(['@/components/report/backInform'], r);
+const cancelNotice = r => require(['@/components/report/cancelNotice'], r);
+const checkInform = r => require(['@/components/report/checkInform'], r);
+const comHeader = r => require(['@/components/report/comHeader'], r);
+const informOutline = r => require(['@/components/report/informOutline'], r);
+const violation = r => require(['@/components/report/violation'], r);
+const informSingalData = r => require(['@/components/report/informSingalData'], r);
+const noticeList = r => require(['@/components/report/noticeList'], r);
+const submitSuccess = r => require(['@/components/report/submitSuccess'], r);
 
 // 抢购
 const auction = r => require(['@/components/auction/auction'], r) // 抢购页面
@@ -369,6 +381,56 @@ const router = new Router({
                 path: '/product/:id/:status',
                 name: 'product',
                 component: product
+            },
+            { //商品详情
+                path: '/report/:goods_id/:store_id',
+                name: 'report',
+                component: report
+            },
+            { //商品详情
+                path: '/backInform',
+                name: 'backInform',
+                component: backInform
+            },
+            { //商品详情
+                path: '/cancelNotice',
+                name: 'cancelNotice',
+                component: cancelNotice
+            },
+            { //商品详情
+                path: '/checkInform',
+                name: 'checkInform',
+                component: checkInform
+            },
+            { //商品详情
+                path: '/comHeader',
+                name: 'comHeader',
+                component: comHeader
+            },
+            { //商品详情
+                path: '/informOutline',
+                name: 'informOutline',
+                component: informOutline
+            },
+            { //商品详情
+                path: '/violation',
+                name: 'violation',
+                component: violation
+            },
+            { //商品详情
+                path: '/informSingalData',
+                name: 'informSingalData',
+                component: informSingalData
+            },
+            { //商品详情
+                path: '/noticeList',
+                name: 'noticeList',
+                component: noticeList
+            },
+            { //商品详情
+                path: '/submitSuccess',
+                name: 'submitSuccess',
+                component: submitSuccess
             },
             { //积分商品详情
                 path: '/integralDetail/:id/:status',

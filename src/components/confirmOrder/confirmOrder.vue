@@ -173,18 +173,18 @@
 		methods: {
             //获取   店铺id 和 收货地址id
 			getconfirmOrder(){
-				console.log(this.goods_data)
-				console.log(this.rec_address)
+				// console.log(this.goods_data)
+				// console.log(this.rec_address)
 				this.axios.post(this.$httpConfig.requeryConfirmOrderId,qs.stringify({
 					store_id:this.goods_data.store_id,
 					address_id:this.rec_address.id}),'psot').then((res) => {
-                   console.log(res);
-                   console.log("data"+res.data.data.delivery);
+                   // console.log(res);
+                   // console.log("data"+res.data.data.delivery);
                    this.delivery=res.data.data.delivery;
                    this.money=res.data.data.money;
                    this.transport=res.data.data.transport;
                    this.mechantdata=res.data.data;
-                   console.log("状态status:"+res.data.status)
+                   // console.log("状态status:"+res.data.status)
 					this.status=res.data.status;
                    /*console.log("成功")*/
 				}).catch((err) => {

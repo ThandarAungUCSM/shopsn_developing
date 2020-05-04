@@ -12,8 +12,10 @@
           <!--<span>购物车</span>-->
         </div>
         <div class="collect" @click="col">
-          <img :src="imgsNo" alt v-if="type==2" />
-          <img v-else :src="imgsYes" alt />
+          <img v-if="type==2" :src="imgsYes" alt />
+          <img :src="imgsNo" alt v-else />
+<!--          <img :src="imgsNo" alt v-if="type==2" />-->
+<!--          <img v-else :src="imgsYes" alt />-->
           <!--<span v-if="type==2">收藏</span>-->
           <!--<span v-else>已收藏</span>-->
         </div>
@@ -39,7 +41,15 @@ export default {
       service: require("@/assets/images/service_er.png"),
       Buycar: require("@/assets/images/car_shop.png"),
       dataCol: [],
-      choice: true
+      choice: true,
+      specification: '',
+      specification_id: '',
+      specific: '',
+      specId: '',
+      IId: '',
+      specific_id: '',
+      option: '',
+
     };
   },
   props: {
@@ -48,7 +58,8 @@ export default {
     nb: "",
     Number: "",
     money: "",
-    storeid: ""
+    storeid: "",
+    productData: ""
   },
   created() {
     this.post();
@@ -117,6 +128,8 @@ export default {
     //进来就算是收藏状态
     hide() {
       this.$store.state.const_join = true;
+      // this.opt = !this.opt;
+
     },
     buy() {
       sessionStorage.removeItem("invoiceGroup");
@@ -133,11 +146,29 @@ export default {
         });
         return;
       }
+      // let goods_id = "";
+      // if(this.productData.id) {
+      //   // console.log(JSON.stringify(this.productData.id))
+      //   goods_id = this.productData.id;
+      // }
+      // else if (this.$store.state.goods_id) {
+      //   goods_id = this.$store.state.goods_id;
+      // } else {
+      //   goods_id = this.$route.params.id;
+      // }
       let goods_id = "";
+      // if(this.addClassClick == true) {
+      //
+      // }
       if (this.$store.state.goods_id) {
         goods_id = this.$store.state.goods_id;
-      } else {
-        goods_id = this.$route.params.id;
+        // console.log(goods_id)
+      }
+      //  else {
+      //   goods_id = this.$route.params.id;
+      // }
+      else if(this.productData.id) {
+        goods_id = this.productData.id;
       }
       this.$router.push({
         name: "order",

@@ -89,7 +89,8 @@ export default {
           "意见反馈",
           "套餐订单",
           "积分订单",
-          "分销中心"
+          "分销中心",
+          "举报"
         ],
         icon: [
           require("@/assets/images/coupon.png"),
@@ -106,7 +107,8 @@ export default {
           require("@/assets/images/opinion.png"),
           require("@/assets/images/package-0.png"),
           require("@/assets/images/intmall_order.png"),
-          require("@/assets/images/fenxiaozhongxin.png")
+          require("@/assets/images/fenxiaozhongxin.png"),
+          require("@/assets/images/report1.png")
         ]
       },
       scrollWatch: false,
@@ -222,6 +224,9 @@ export default {
             break;
           case 14:
             this.$router.push("/distribution");
+            break;
+          case 15:
+            this.$router.push("/informOutline");
             break;
         }
       }
@@ -516,6 +521,14 @@ export default {
   border-top: 1px solid #dfdfdf;
   background: #fff;
   li:nth-child(15) {
+    .icon-main {
+      img {
+        display: inline-block;
+        width: 0.68rem;
+      }
+    }
+  }
+  li:nth-child(16) {
     .icon-main {
       img {
         display: inline-block;

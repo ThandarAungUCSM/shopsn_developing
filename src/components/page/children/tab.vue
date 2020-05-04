@@ -27,32 +27,65 @@
             <mt-tab-container-item id="3">
                 <div class="comment-wrap">
                     <ul>
-                        <li @click="conActiveClick(index)" v-for="(item,index) in conName" :key="index" :class="{conActive: index== comIndex}">
-                            <span>{{item}}</span>
-                            <p v-if="index ==0">{{commenData.allcount}}</p>
-                            <p v-if="index ==1">{{commenData.nice}}</p>
-                            <p v-if="index ==2">{{commenData.height}}</p>
-                            <p v-if="index ==3">{{commenData.bad}}</p>
-                            <p v-if="index ==4">{{commenData.image}}</p>
+<!--                        <li @click="conActiveClick(index)" v-for="(item,index) in conName" :key="index" :class="{conActive: index== comIndex}">-->
+<!--                            <span>{{item}}</span>-->
+<!--                            <p v-if="index ==0">{{commenData.allcount}}</p>-->
+<!--                            <p v-if="index ==1">{{commenData.nice}}</p>-->
+<!--                            <p v-if="index ==2">{{commenData.height}}</p>-->
+<!--                            <p v-if="index ==3">{{commenData.bad}}</p>-->
+<!--                            <p v-if="index ==4">{{commenData.image}}</p>-->
+<!--                        </li>-->
+<!--                        <li @click="conActiveClick(index)" v-for="(item,index) in conName" :key="index" :class="{conActive: index== comIndex}">-->
+<!--                            <span>{{item}}</span>-->
+<!--                            <p v-if="index ==0">{{commentName.allCount}}</p>-->
+<!--                            <p v-if="index ==1">{{commentName.allNice}}</p>-->
+<!--                            <p v-if="index ==2">{{commentName.allHeight}}</p>-->
+<!--                            <p v-if="index ==3">{{commentName.allBad}}</p>-->
+<!--                            <p v-if="index ==4">{{commentName.allImg}}</p>-->
+<!--                        </li>-->
+
+                        <li :class="comIndex == 0? 'conActive': ''" @click="comContent(0)">
+                            <span>全部评价</span>
+                            <p>{{ allCount || 0 }}</p>
                         </li>
+                        <li :class="comIndex == 1? 'conActive': ''" @click="comContent(1)">
+                            <span>好评</span>
+                            <p>{{ allNice || 0 }}</p>
+                        </li>
+                        <li :class="comIndex == 2? 'conActive': ''" @click="comContent(2)">
+                            <span>中评</span>
+                            <p>{{ allHeight || 0 }}</p>
+                        </li>
+                        <li :class="comIndex == 3 ? 'conActive': ''" @click="comContent(3)">
+                            <span>差评</span>
+                            <p>{{ allBad || 0 }}</p>
+                        </li>
+                        <li :class="comIndex == 4? 'conActive': ''" @click="comContent(4)">
+                            <span>有图</span>
+                            <p>{{ allImg || 0 }}</p>
+                        </li>
+
                     </ul>
-                    <div v-if="dataItem.length == 0" class="center">暂无评论</div>
-                    <div v-else class="list-wrap" v-for="item in dataItem" :key="item.id">
+                    <div v-if="dataItem == null" class="center">暂无评论</div>
+                    <div v-else class="list-wrap" v-for="item in dataItem" :key="item.id + 'i'">
                         <div class="list-hd clearfix">
                             <div class="pull-left fl">
                                 <img src="../../../assets/user-d.jpg">
-                                <span >{{item.user_name}}</span>
+                                <span >{{item.nick_name}}</span>
                             </div>
                             <div class="pull-right fr">
                                 <img v-for = 'n in parseInt(item.score)' :key = 'n' :src="imgYes">
-                                <img v-for = 'n in 5-parseInt(item.score)' :key ='n' :src="imgNo">
+                                <img v-for = 'n in 5-parseInt(item.score)' :key ="n + 'i'" :src="imgNo">
                             </div>
                         </div>
                         <div class="list-com">{{item.content}}</div>
-                        <div class="list-img-main clearfix" >
-                            <img :class="{'active':isChoose}"  @click="imgScc" :src="URL + items.path" class="fl" v-for="items in item.img" :key="items.id">
+                        <div class="list-img-main clearfix" v-for="items in item.path" :key="items.id + 'j'">
+<!--                            <img :class="{'active':isChoose}"  @click="imgScc" :src="URL + items.path" class="fl" v-for="items in item.path" :key="items.id">-->
+                            <img :class="{ 'active': tempImgValue == items && isChoose  }"  @click="imgScc(items)" :src="URL + items.path" class="fl" >
+                            <!--                            'active':(page === currentPage)}-->
                         </div>
-                        <div class="list-purTimer">{{item.goods_apace[0].speName}}&nbsp;&nbsp;&nbsp;{{item.goods_apace[0].item }} &nbsp;&nbsp;&nbsp;{{Number(item.create_time)|formatDate}}</div>
+<!--                        <div class="list-purTimer">{{item.goods_apace[0].speName}}&nbsp;&nbsp;&nbsp;{{item.goods_apace[0].item }} &nbsp;&nbsp;&nbsp;{{Number(item.create_time)|formatDate}}</div>-->
+                        <div class="list-purTimer">{{Number(item.create_time)|formatDate}}</div>
                     </div>
                 </div>
             </mt-tab-container-item>
@@ -112,7 +145,14 @@
                 text:'',
                 sonState:false,
                 specData:'',
-                isChoose:false
+                isChoose:false,
+                commentName: [],
+                allCount: 0,
+                allNice: 0,
+                allHeight: 0,
+                allBad: 0,
+                allImg: 0,
+                tempImgValue: ''
             }
         }, 
         methods:{
@@ -137,9 +177,13 @@
                 }
                 return (Y + "-" + m + "-" + d);
             },
-            imgScc(){
-                this.isChoose = !this.isChoose  
-            },  
+            // imgScc(){
+            //     this.isChoose = !this.isChoose
+            // },
+            imgScc(value){
+                this.tempImgValue = value
+                this.isChoose = !this.isChoose
+            },
             // 提交咨询
             proSubmit(){
                 if(!this.problem){
@@ -241,23 +285,31 @@
                         this.comId = 5;
                         break;
                     }
-                    this.comContent()
+                    this.comContent(0)
             },
             //评论
-            comContent(){
+            comContent(type){
+                this.comIndex = type;
                 this.load = true;
                  this.axios({
                     url:this.$httpConfig.getAllCommentContent,
                     method:'get',
                     params:{
                         goods_id:this.$route.params.id,
+                        type: type,
                         status:4,
                         page:this.page
                     }
                 }).then((res) => {
                     this.load = false
                     if(res.data.status==1){
-                    	 this.dataItem= res.data.data.records;
+                    	 this.dataItem= res.data.data.data.list;
+                        // this.commentName=res.data.data.data;
+                        this.allCount = res.data.data.data.allCount;
+                        this.allNice = res.data.data.data.allNice;
+                        this.allHeight = res.data.data.data.allHeight;
+                        this.allBad = res.data.data.data.allBad;
+                        this.allImg = res.data.data.data.allImg;
                     }
                    
                 }).catch((err) => {
@@ -297,7 +349,7 @@
                         break;
                     case '3':
                         this.commentAjax()
-                        this.comContent()
+                        this.comContent(0)
                         break;
                     case '4':
                         this.productAjax()
@@ -345,6 +397,7 @@
             height:.75rem;
             background:#fff;
             line-height:.75rem;
+            margin: 0 0 .2rem 0;
             .mint-tab-item{
                 height:100%;
                 padding:0;
@@ -355,8 +408,8 @@
         .center{
             text-align: center;
             height: 3rem;
-            line-height: 3rem;
-            font-size: .3rem;
+            line-height: 10rem;
+            font-size: .4rem;
         }
         .list-wrap{
             padding-top:.2rem;
@@ -404,6 +457,10 @@
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
             }
+        }
+        .mint-tab-container {
+            overflow: visible;
+            position: relative;
         }
         .comment-wrap{
             ul{
@@ -481,11 +538,12 @@
                         transform: scale(1);            /*图片原始大小1倍*/
                         transition: all ease 0.5s;      /*图片放大所用时间*/
                     }
-                    img.active {     
-                        transform: scale(3);          /*图片需要放大3倍*/
+                    img.active {
+                        transform: scale(5);          /*图片需要放大3倍*/
                         position: absolute;           /*是相对于前面的容器定位的，此处要放大的图片，不能使用position：relative；以及float，否则会导致z-index无效*/
                         z-index: 100;
-                    } 
+                        margin-left: 3rem;
+                    }
                 }
                 .list-purTimer{
                     padding-top:.2rem;

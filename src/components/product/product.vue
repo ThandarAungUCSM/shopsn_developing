@@ -8,8 +8,36 @@
       </mt-swipe-item>
     </mt-swipe>
     <div class="describe" v-if="$store.state.commodity_data">
-      <p class="fn">{{$store.state.commodity_data.goods.title}}</p>
-      <p class="price">
+      <div>
+
+
+        <div v-if="opt">
+          <p class="fn" v-if="detail">{{$store.state.commodity_data.goods.title}}</p>
+          <p class="fn" v-else>{{$store.state.commodity_data.goods.title}}</p>
+        </div>
+        <div v-if="!opt">
+          <p class="fn" v-if="detail">{{$store.state.commodity_data.goods.title}}</p>
+          <!-- <p class="fn" v-else>{{$store.state.commodity_data.goods.title}}{{option}}</p> -->
+          <p class="fn" v-else>{{$store.state.commodity_data.goods.title}}</p>
+        </div>
+
+      </div>
+      <!--      <p class="fn" v-if="!opt">{{$store.state.commodity_data.goods.title}}{{option}}</p>-->
+      <!--      <p class="fn" v-if="opt">{{$store.state.commodity_data.goods.title}}</p>-->
+
+      <p class="price" v-if="$store.state.commodity_data.goods.p_id==0">
+        <span style="color:red;font-size:20px">
+          ￥
+          {{productData.price_member}}
+        </span>
+        <span class="new">
+          原价 ：￥
+          <s>{{productData.price_market}}</s>
+        </span>
+        <!--        <span class="report" @click="Report">举报</span>-->
+        <span class="report" @click="handleNotice">举报</span>
+      </p>
+      <p class="price" v-else>
         <span style="color:red;font-size:20px">
           ￥
           {{$store.state.commodity_data.goods.price_member}}
@@ -18,13 +46,61 @@
           原价 ：￥
           <s>{{$store.state.commodity_data.goods.price_market}}</s>
         </span>
+        <!--        <span class="report" @click="Report">举报</span>-->
+        <span class="report" @click="handleNotice">举报</span>
       </p>
     </div>
+
+    <!--promotion-->
+    <div v-if="detailId == detialSubId">
+    <div v-if="promotion.length > 0" @click="showPromotion">
+      <div class="promotion">
+        <p class="title">促销</p>
+          <div class="body" v-for="(item,index) in promotion" :key="index">
+            <p class="text" v-if="index==0">
+              <span class="name">{{item.name}}</span>
+              <span class="full">(满 {{item.full}} 元， 数量 {{item.give_count}} 赠完即止)</span>
+            </p>
+            <p class="text" v-if="index==1">
+              <span class="name">{{item.name}}</span>
+              <span class="full">满 {{item.full}} 减 {{item.expression}}</span>
+            </p>
+          </div>
+        </div>
+        <span class="btn-right"></span>
+      </div>
+      <div class="fenge"></div>
+    </div>
+    <div v-else>
+    </div>
+
+    <transition  name="fade">
+      <div class="promotion_box" v-if="pro">
+        <div class="promotion_main">
+          <div class="promotion_header">
+            <p class="promotion_text">优惠</p>
+            <span class="promotion_cross" @click="showPromotion">×</span>
+          </div>
+          <div class="box_promotion">
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- 已选 -->
     <div class="selected" @click="theSon">
       <span class="title">规格</span>
-      <span style="float:right; padding-right: .2rem; font-size: .26rem;" v-if="!opt">{{option}}</span>
-      <span style="float:right; padding-right: .2rem; font-size: .26rem;" v-if="opt" @click="theSon">{{detail}}</span>
+      <div v-if="opt">
+        <span style="float:right; padding-right: .2rem; font-size: .26rem; margin-top: -.8rem;" v-if="opt" @click="theSon">{{detail}}</span>
+        <span style="float:right; padding-right: .2rem; font-size: .26rem; margin-top: -.8rem;" v-else>{{detail}}</span>
+      </div>
+      <div v-if="!opt">
+        <span style="float:right; padding-right: .2rem; font-size: .26rem; margin-top: -.8rem;" v-if="detail !== ''">{{detail}}</span>
+        <span style="float:right; padding-right: .2rem; font-size: .26rem; margin-top: -.8rem;" v-else>{{option}}</span>
+      </div>
+
+
+
       <span
               v-if="item"
               v-for="(item, index) in $store.state.guigeidname"
@@ -37,23 +113,23 @@
 
     <div class="for-discount" @click="showCoupon">
       <span class="discount_text">优惠</span>
-<!--       <span-->
-<!--              class="coupon_img"-->
-<!--              v-for="(item,index) in couponList"-->
-<!--              :key="index.id">-->
-<!--          {{item.name}}-->
-<!--      </span>-->
-<!--      <span-->
-<!--              class="coupon_img"-->
-<!--              >超级用户 VIP-->
+      <span
+              class="coupon_img"
+              v-for="(item,index) in couponList.slice(0,3)"
+              :key="index.id">
+         {{item.name}}
+     </span>
+      <!--      <span-->
+      <!--              class="coupon_img"-->
+      <!--              >超级用户 VIP-->
 
-<!--      </span>-->
-<!--      <span-->
-<!--              class="coupon_message"-->
-<!--              v-for="item in data"-->
-<!--      >{{item.message}}-->
+      <!--      </span>-->
+      <!--      <span-->
+      <!--              class="coupon_message"-->
+      <!--              v-for="item in data"-->
+      <!--      >{{item.message}}-->
 
-<!--            </span>-->
+      <!--            </span>-->
       <span class="btn-right"></span>
       <!-- <div class="for-security">
           <button>产地证明</button>
@@ -69,19 +145,20 @@
     <transition  name="fade">
       <div class="coupon_box" v-if="sta">
         <div class="box_main">
-            <div class="box_header">
-                <p class="box_text">领券</p>
-                <span class="box_cross" @click="showCoupon">×</span>
-            </div>
+          <div class="box_header">
+            <p class="box_text">领券</p>
+            <span class="box_cross" @click="showCoupon">×</span>
+          </div>
           <div class="box_box">
             <div class="box_body" v-for="(item,index) in couponList" :key="index.id" @click="couponReceive(index)">
               <div class="body_left">
                 <span class="left_money">￥{{item.money}}</span>
                 <span class="left_name">{{item.name}}</span>
+                <p class="condition">满{{item.condition}}元可以使用</p>
                 <p class="left_time">有效期 {{new Date(item.use_start_time * 1000).getFullYear()+'.'+(new Date(Number(item.use_start_time * 1000)).getMonth()+1)+'.'+new Date(Number(item.use_start_time * 1000)).getDate()}} - {{new Date(item.use_end_time * 1000).getFullYear()+'.'+(new Date(Number(item.use_end_time * 1000)).getMonth()+1)+'.'+new Date(Number(item.use_end_time * 1000)).getDate()}}</p>
-              <span class="body_circle"></span>
-              <span class="body_circle1"></span>
-                </div>
+                <span class="body_circle"></span>
+                <span class="body_circle1"></span>
+              </div>
               <div class="body_right">立即领取</div>
             </div>
           </div>
@@ -112,6 +189,7 @@
             @recommend="matchGood($store.state.commodity_data.goods.id)"
             v-if="guige"
             :data="$store.state.commodity_data"
+            :productData="productData"
             @sendValue="sendValue"
     ></detail-option>
     <Shopsn></Shopsn>
@@ -120,6 +198,7 @@
             :state="sonState"
             :Number="$store.state.commodity_val"
             :data="$store.state.commodity_data"
+            :productData = "productData"
             @reduce="reduce"
             @plus="plus"
             :money="this.$route.params.money"
@@ -145,12 +224,17 @@
     name: "product",
     data() {
       return {
+        pro:false,
         sta:false,
-        // data:[],
         couponList:[],
         detail: '',
+        detailId: null,
+        detialSubId: null,
         option: '',
         opt:false,
+        promotion: '',
+        promotion_id: '',
+        route_id: '',
         //是否显示状态条
         showIndicators: true,
         //初始轮播切换索引
@@ -183,16 +267,87 @@
         images: [],
         page: 1,
         p_id: 0,
-        store__id: 0
+        store__id: 0,
+        specification: '',
+        specification_id: '',
+        specific: '',
+        specId: '',
+        IId: '',
+        specific_id: '',
+        productData: '',
+        detailAllData: ''
       };
     },
+
     created() {
       this.$store.state.const_join = false;
       this.$store.state.catr_number = 0;
       this.$store.state.goods_id = "";
       this.$store.state.matchGood = "";
+
+      this.axios
+              .post(
+                      this.$httpConfig.goodSpecsByGoodsChildren,
+                      qs.stringify({
+                        id: this.$route.params.id
+                      })
+              )
+              .then(res => {
+                if (res.data.status == 1) {
+                  this.specification = res.data.data;
+                  this.option = res.data.data.spec.spec_children[0].item;
+                  this.IId = res.data.data.spec.spec_children[0].id;
+                  for (let i in this.specification.goods) {
+                    this.specId = res.data.data.goods[i].key.split("_");
+                    if(this.IId == this.specId) {
+                      this.specific_id = res.data.data.goods[i].goods_id;
+
+                      this.axios({
+                        url: this.$httpConfig.goodInfo,
+                        method: "get",
+                        params: {
+                          id: this.specific_id
+                        }
+                      })
+                              .then(res => {
+                                this.productData = res.data.data.goods;
+                                this.promotion = res.data.data.promotion;
+                              })
+                              .catch(err => {
+                                console.log(err);
+                              });
+                      this.axios
+                              .post(
+                                      this.$httpConfig.matchGood,
+                                      qs.stringify({
+                                        goods_id: this.specific_id
+                                      })
+                              )
+                              .then(res => {
+                                this.$store.state.matchGood = res.data.data;
+                              })
+                              .catch(err => {
+                                console.log(err);
+                              });
+                    }
+                  }
+                }
+              })
+              .catch(err => {
+                console.log(err);
+              });
     },
     methods: {
+      handleNotice() {
+        location.replace(window.location.origin +
+                "/" +"informOutline?x=" +
+                1 +
+                "&notice=1" +
+                "&store_id=" +
+                this.store__id +
+                "&goods_id=" +
+                this.route_id+'&main_id='+this.p_id)
+      },
       countDown() {
         this.finish = true;
       },
@@ -208,6 +363,20 @@
       theSon() {
         this.$store.state.const_join = true;
         this.opt = !this.opt;
+
+        this.axios({
+          url: this.$httpConfig.goodInfo,
+          method: "get",
+          params: {
+            id: this.specific_id
+          }
+        })
+                .then(res => {
+                  this.productData = res.data.data.goods
+                })
+                .catch(err => {
+                  console.log(err);
+                });
       },
       myLove() {
         this.axios
@@ -222,6 +391,7 @@
       //属性
       // spec() {},
       optionSpec() {
+
         this.axios
                 .post(
                         this.$httpConfig.goodSpecsByGoodsChildren,
@@ -231,7 +401,71 @@
                 )
                 .then(res => {
                   if (res.data.status == 1) {
+                    this.specification = res.data.data;
                     this.option = res.data.data.spec.spec_children[0].item;
+                    this.IId = res.data.data.spec.spec_children[0].id;
+                    for (let i in this.specification.goods) {
+                      this.specId = res.data.data.goods[i].key.split("_");
+                      if(this.IId == this.specId) {
+                        this.specific_id = res.data.data.goods[i].goods_id;
+
+                        this.axios({
+                          url: this.$httpConfig.goodInfo,
+                          method: "get",
+                          params: {
+                            id: this.specific_id
+                          }
+                        })
+                                .then(res => {
+                                  this.productData = res.data.data.goods;
+                                  this.promotion = res.data.data.promotion;
+                                })
+                                .catch(err => {
+                                  console.log(err);
+                                });
+                      }
+                    }
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+      },
+      optionSpec2() {
+
+        this.axios
+                .post(
+                        this.$httpConfig.goodSpecsByGoodsChildren,
+                        qs.stringify({
+                          id: this.$route.params.id
+                        })
+                )
+                .then(res => {
+                  if (res.data.status == 1) {
+                    this.specification = res.data.data;
+                    this.option = this.detailAllData.item
+                    this.IId = this.detailAllData.id
+                    for (let i in this.specification.goods) {
+                      this.specId = res.data.data.goods[i].key.split("_");
+                      if(this.IId == this.specId) {
+                        this.specific_id = res.data.data.goods[i].goods_id;
+
+                        this.axios({
+                          url: this.$httpConfig.goodInfo,
+                          method: "get",
+                          params: {
+                            id: this.specific_id
+                          }
+                        })
+                                .then(res => {
+                                  this.productData = res.data.data.goods;
+                                  this.promotion = res.data.data.promotion;
+                                })
+                                .catch(err => {
+                                  console.log(err);
+                                });
+                      }
+                    }
                   }
                 })
                 .catch(err => {
@@ -292,6 +526,11 @@
                   this.load_wrap = false;
                   this.p_id = res.data.data.goods.p_id;
                   this.store__id = res.data.data.goods.store_id;
+                  this.route_id = res.data.data.goods.id;
+                  this.promotion = res.data.data.promotion;
+                  // console.log(this.promotion)
+                  this.promotion_id = res.data.data.promotion.goods_id;
+                  // console.log(this.promotion_id)
                 })
                 .catch(err => {
                   console.log(err);
@@ -305,19 +544,25 @@
             store_id: 2,
           }
         })
-          .then(res => {
-            this.couponList = res.data.data.records;
-          })
-          .catch(err => {
-            console.log(err);
-          });
+                .then(res => {
+                  this.couponList = res.data.data.records;
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+      },
+      showPromotion() {
+        this.pro = !this.pro;
       },
       showCoupon() {
         this.sta = !this.sta;
       },
-      sendValue(detail, id){
-        this.detail = detail
-        // console.log(this.detail)
+      sendValue(detail, id, subid){
+        this.detail = detail.item
+        this.detailId = id
+        this.detialSubId = subid
+        this.detailAllData = detail
+        this.optionSpec2();
       },
       couponReceive(id) {
         let selectedId = this.couponList[id]
@@ -328,16 +573,16 @@
             id: selectedId.id
           }
         })
-        .then(res => {
-          Toast({
-            message: res.data.message,
-            position: "middle",
-            duration: 1000
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+                .then(res => {
+                  Toast({
+                    message: res.data.message,
+                    position: "middle",
+                    duration: 1000
+                  });
+                })
+                .catch(err => {
+                  console.log(err);
+                });
       },
       reduce() {
         if (this.number <= 1) return;
@@ -352,7 +597,8 @@
       },
       off() {
         this.popupVisible = false;
-      }
+      },
+
     },
     mounted() {
       this.ax();
@@ -428,7 +674,7 @@
     padding-top: .06rem;
     /*margin: .2rem;*/
     /*border-bottom: .01rem solid #F1F1F1;*/
-    /*padding-bottom: 0.2rem;*/
+    padding-bottom: 0.13rem;
     .discount_text {
       font-size: .26rem;
       color: #777;
@@ -450,8 +696,8 @@
     .btn-right {
       position: absolute;
       right: 0.3rem;
-      /*top: 75.2%;*/
-      margin-top: 0.04rem;
+      /*top: 79%;*/
+      margin-top: 0.07rem;
       width: 0.16rem;
       height: 0.3rem;
       background: url(../../assets/btn-right.png) no-repeat;
@@ -494,6 +740,53 @@
     }
   }
 
+  .promotion_box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    .promotion_main {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      border-top-left-radius: .3rem;
+      border-top-right-radius: .3rem;
+      .promotion_header {
+        padding: .4rem .3rem;
+        text-align: center;
+        border-bottom: 1px solid #f1f1f1;
+        .promotion_text  {
+          font-size: .34rem;
+          color: #333;
+        }
+        .promotion_cross {
+          position: absolute;
+          right: 3%;
+          top: 0.38rem;
+          width: 0.4rem;
+          line-height: 0.34rem;
+          height: 0.4rem;
+          border: 1px solid #bfbfbf;
+          text-align: center;
+          font-size: 0.4rem;
+          color: #bfbfbf;
+          border-radius: 100%;
+        }
+      }
+      .box_promotion {
+        padding: 0 0 .3rem 0;
+        height: 8.85rem;
+        overflow-y: scroll;
+        position: relative;
+      }
+    }
+  }
+
   .coupon_box {
     position: fixed;
     top: 0;
@@ -508,33 +801,35 @@
       bottom: 0;
       width: 100%;
       background: #fff;
-        .box_header {
-            padding: .4rem .3rem;
-            text-align: center;
-            border-bottom: 1px solid #f1f1f1;
-            .box_text  {
-                font-size: .34rem;
-                color: #333;
-            }
-            .box_cross {
-                position: absolute;
-                right: 3%;
-                top: 0.38rem;
-                width: 0.4rem;
-                line-height: 0.34rem;
-                height: 0.4rem;
-                border: 1px solid #bfbfbf;
-                text-align: center;
-                font-size: 0.4rem;
-                color: #bfbfbf;
-                border-radius: 100%;
-            }
+      border-top-left-radius: .3rem;
+      border-top-right-radius: .3rem;
+      .box_header {
+        padding: .4rem .3rem;
+        text-align: center;
+        border-bottom: 1px solid #f1f1f1;
+        .box_text  {
+          font-size: .34rem;
+          color: #333;
         }
+        .box_cross {
+          position: absolute;
+          right: 3%;
+          top: 0.38rem;
+          width: 0.4rem;
+          line-height: 0.34rem;
+          height: 0.4rem;
+          border: 1px solid #bfbfbf;
+          text-align: center;
+          font-size: 0.4rem;
+          color: #bfbfbf;
+          border-radius: 100%;
+        }
+      }
       .box_box {
         padding: 0 0 .3rem 0;
-          height: 7rem;
-          overflow-y: scroll;
-          position: relative;
+        height: 8.85rem;
+        overflow-y: scroll;
+        position: relative;
         .box_body {
           padding: .3rem;
           margin-bottom: 1.5rem;
@@ -555,6 +850,11 @@
           }
           .left_name {
             font-size: .3rem;
+          }
+          .condition{
+            padding-left: .3rem;
+            line-height: 0.55rem;
+            margin-top: -0.3rem;
           }
           .left_time {
             font-size: .26rem;
@@ -656,6 +956,11 @@
           font-size: 0.24rem;
         }
       }
+      .report {
+        float: right;
+        font-size: .28rem;
+        color: red;
+      }
     }
     .share {
       position: absolute;
@@ -692,6 +997,46 @@
     }
   }
 
+  .promotion {
+    padding: 0.1rem 0.5rem 0.1rem 0.2rem;
+    color: #777;
+    position: relative;
+    background: #fff;
+    .title {
+      font-size: .26rem;
+      padding: 0.15rem 0.2rem 0 0;
+      position: absolute;
+    }
+    .body {
+      margin-left: .7rem;
+      .text {
+
+        .name {
+          font-size: .26rem;
+          border: 1px solid #d02629;
+          border-radius: .06rem;
+          color: #d02629;
+          line-height: 2.5;
+          padding: 0 .04rem;
+        }
+        .full {
+          font-size: .26rem;
+          padding-left: .1rem;
+        }
+      }
+    }
+    .btn-right {
+      position: absolute;
+      right: 0.3rem;
+      top: 50%;
+      margin-top: -0.15rem;
+      width: 0.16rem;
+      height: 0.3rem;
+      background: url(../../assets/btn-right.png) no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+
   .selected {
     padding: 0 0.5rem 0 0.2rem;
     min-height: 0.8rem;
@@ -701,10 +1046,10 @@
     position: relative;
     background: #fff;
     border-top: 1px solid #f1f1f1;
-      .title {
-          font-size: .26rem;
-          color: #777;
-      }
+    .title {
+      font-size: .26rem;
+      color: #777;
+    }
     .number {
       font-size: 0.28rem;
       color: #333;
